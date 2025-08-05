@@ -1,0 +1,17 @@
+{
+  "name": "shopify-cli-3-workshop",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "env-cmd -r shopify.presets.json -e development shopify theme dev",
+    "dev:test": "env-cmd -r shopify.presets.json -e test shopify theme dev",
+    "dev:prod": "env-cmd -r shopify.presets.json -e test,production shopify theme dev",
+    "push:test": "env-cmd -r shopify.presets.json -e test shopify theme push -u",
+    "push:prod": "env-cmd -r shopify.presets.json -e test,production shopify theme push -u",
+    "push:shopify-incomplete-solution": "shopify theme push --preset development"
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0"
+  }
+}
