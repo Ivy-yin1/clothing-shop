@@ -1,0 +1,89 @@
+{% assign trimmed_menu_list_type = menuListType | strip %}
+
+<script>
+  // 将Liquid变量传递给JavaScript并在控制台输出
+</script>
+
+{% if trimmed_menu_list_type == 'ImageWithTitleAndImageOnlyList' %}
+  {% render 'image-with-title-and-image-only-list', link: link， forloop：forloop %}
+  {% comment %}
+    {% elsif trimmed_menu_list_type  == 'SideBySideList' %}
+      {% render 'side-by-side-list', menu_list: link ， forloop：forloop%}
+    {% elsif trimmed_menu_list_type  == 'VerticalStackList' %}
+      {% render 'vertical-stack-list', menu_list: link ， forloop：forloop%}
+  {% endcomment %}
+{% else %}
+  <ul
+    id="HeaderMenu-MenuList-{{ forloop.index }}"
+    class="header__submenu list-menu list-menu--disclosure color-{{ section.settings.menu_color_scheme }} gradient caption-large motion-reduce global-settings-popup"
+    role="list"
+    tabindex="-1"
+  >
+    {%- for childlink in link.links -%}
+      <li>
+        {%- if childlink.links == blank -%}
+          <a
+            id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}"
+            href="{{ childlink.url }}"
+            class="header__menu-item list-menu__item link link--text focus-inset caption-large{% if childlink.current %} list-menu__item--active{% endif %}"
+            {% if childlink.current %}
+              aria-current="page"
+            {% endif %}
+          >
+            {{ childlink.title | escape }}
+            {% comment %}
+              {% assign parts = childlink.title | split: '|' %}
+              {% if parts.size >= 2 %}
+                {% comment %}
+                  <div>
+                    <img
+                      src="{{ parts[2] | strip }}"
+                      alt="{{ parts[0] | strip }}"
+                      width="124"
+                      height="100"
+                      class="title-image"
+                    >
+                    <p class="list-menu__item-level2-title-text">{{ parts[0] | strip }}</p>
+                  </div>
+                {% endcomment %}
+
+              {% else %}
+                <!-- 处理格式不符合预期的情况 -->
+                <span>{{ childlink.title }}</span>
+              {% endif %}
+            {% endcomment %}
+          </a>
+        {%- else -%}
+          <details id="Details-HeaderSubMenu-{{ link.handle }}-{{ childlink.handle }}">
+            <summary
+              id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}"
+              class="header__menu-item link link--text list-menu__item focus-inset caption-large"
+            >
+              <span>{{ childlink.title | escape }}</span>
+              {{- 'icon-caret.svg' | inline_asset_content -}}
+            </summary>
+            <ul
+              id="HeaderMenu-SubMenuList-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
+              class="header__submenu list-menu motion-reduce"
+            >
+              {%- for grandchildlink in childlink.links -%}
+                <li>
+                  <a
+                    id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
+                    href="{{ grandchildlink.url }}"
+                    class="header__menu-item list-menu__item link link--text focus-inset caption-large{% if grandchildlink.current %} list-menu__item--active{% endif %}"
+                    {% if grandchildlink.current %}
+                      aria-current="page"
+                    {% endif %}
+                  >
+                    {{ grandchildlink.title | escape }}
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </details>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ul>
+{%- endif -%}

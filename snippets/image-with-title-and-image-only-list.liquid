@@ -1,0 +1,205 @@
+{%- assign image_with_title_items = '' -%}
+{%- assign image_only_items = '' -%}
+
+{%- for childlink in link.links -%}
+  {%- assign parts = childlink.title | split: '|' -%}
+  {%- if parts.size >= 3 -%}
+    {%- assign menu_type = parts[1] | strip -%}
+    {%- capture menu_item -%}
+      <a href="{{ childlink.url }}" class="menu-item-link">
+        <div class="menu-item">
+          <div class="menu-item-inner">
+            <img
+              src="{{ parts[2] | strip }}"
+              alt="{{ parts[0] | strip }}"
+              class="menu-item-image"
+              data-menu-type="{{ menu_type }}"
+            >
+            {%- if menu_type == 'ImageWithTitle' -%}
+              <p class="menu-item-title">{{ parts[0] | strip }}</p>
+            {%- endif -%}
+          </div>
+        </div>
+      </a>
+    {%- endcapture -%}
+
+    {%- if menu_type == 'ImageWithTitle' -%}
+      {%- assign image_with_title_items = image_with_title_items | append: menu_item -%}
+    {%- elsif menu_type == 'ImageOnly' -%}
+      {%- assign image_only_items = image_only_items | append: menu_item -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+
+<div
+  id="HeaderMenu-MenuList-{{ forloop.index }}"
+  class="
+    header__submenu list-menu list-menu--disclosure  gradient caption-large motion-reduce global-settings-popup two-column-menu   color-{{ section.settings.menu_color_scheme }}
+  "
+  role="list"
+  tabindex="-1"
+>
+  <div class="menu-content-wrapper">
+    {%- if image_with_title_items != '' -%}
+      <div class="menu-column menu-column-left">
+        <div class="menu-grid">
+          {{ image_with_title_items }}
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- if image_only_items != '' -%}
+      <div class="menu-column menu-column-right">
+        <div class="menu-list">
+          {{ image_only_items }}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+  .two-column-menu {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    min-height: 400px;
+    width: 100vw !important;
+    overflow: visible !important;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    left: 0;
+    top: 105px;
+    z-index: 1000;
+  }
+
+  .menu-content-wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .menu-column {
+    padding: 20px;
+    overflow: visible;
+  }
+
+  .menu-column-left {
+    flex: 2;
+    padding-right: 15px;
+    margin-right: 30px;
+  }
+
+  .menu-column-right {
+    flex: 1;
+    border-left: 1px solid #e0e0e0;
+  }
+
+  .menu-content-wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  .menu-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px 20px;
+  }
+
+  .menu-item-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .menu-item {
+    break-inside: avoid;
+  }
+
+  .menu-item-inner {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .menu-item-inner:hover .menu-item-title {
+    color: green;
+  }
+
+  .menu-grid .menu-item-image {
+    width: 124px;
+    height: 100px;
+    object-fit: cover;
+    margin: 10px auto 0 auto;
+    flex-shrink: 0;
+    background: #8adfd0;
+    padding: 5px;
+    border-radius: 4px;
+  }
+
+  .menu-grid .menu-item-title {
+    margin: 15px 0 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .menu-list .menu-item {
+    margin-bottom: 20px;
+    overflow: visible;
+  }
+
+  .menu-list .menu-item-inner {
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .menu-list .menu-item-image {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+    border-radius: 6px;
+    background: #8adfd0;
+    padding: 8px;
+  }
+
+  .menu-grid .menu-item:nth-child(n + 5)::before {
+    content: '';
+    display: block;
+    width: calc(100% + 40px);
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 0 -20px 25px -20px;
+  }
+
+  .menu-grid .menu-item:nth-child(-n + 4)::before {
+    display: none;
+  }
+
+  .menu-grid .menu-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu-column-right {
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 600px;
+  }
+
+  .menu-list {
+    padding-bottom: 10px;
+  }
+</style>

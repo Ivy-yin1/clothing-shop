@@ -11,72 +11,21 @@
       <li>
         {%- if link.links != blank -%}
           <header-menu>
-            <details id="Details-HeaderMenu-{{ forloop.index }}">
+            <details id="Details-HeaderMenu-{{ forloop.index }}" style="position: static">
+              {% assign parts = link.title | split: '|' %}
               <summary
                 id="HeaderMenu-{{ link.handle }}"
                 class="header__menu-item list-menu__item link focus-inset"
               >
-                <span
-                  {%- if link.child_active %}
-                    class="header__active-menu-item"
-                  {% endif %}
-                >
-                  {{- link.title | escape -}}
-                </span>
+                {{- parts[0] | strip | escape -}}
                 {{- 'icon-caret.svg' | inline_asset_content -}}
               </summary>
-              <ul
-                id="HeaderMenu-MenuList-{{ forloop.index }}"
-                class="header__submenu list-menu list-menu--disclosure color-{{ section.settings.menu_color_scheme }} gradient caption-large motion-reduce global-settings-popup"
-                role="list"
-                tabindex="-1"
-              >
-                {%- for childlink in link.links -%}
-                  <li>
-                    {%- if childlink.links == blank -%}
-                      <a
-                        id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}"
-                        href="{{ childlink.url }}"
-                        class="header__menu-item list-menu__item link link--text focus-inset caption-large{% if childlink.current %} list-menu__item--active{% endif %}"
-                        {% if childlink.current %}
-                          aria-current="page"
-                        {% endif %}
-                      >
-                        {{ childlink.title | escape }}
-                      </a>
-                    {%- else -%}
-                      <details id="Details-HeaderSubMenu-{{ link.handle }}-{{ childlink.handle }}">
-                        <summary
-                          id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}"
-                          class="header__menu-item link link--text list-menu__item focus-inset caption-large"
-                        >
-                          <span>{{ childlink.title | escape }}</span>
-                          {{- 'icon-caret.svg' | inline_asset_content -}}
-                        </summary>
-                        <ul
-                          id="HeaderMenu-SubMenuList-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
-                          class="header__submenu list-menu motion-reduce"
-                        >
-                          {%- for grandchildlink in childlink.links -%}
-                            <li>
-                              <a
-                                id="HeaderMenu-{{ link.handle }}-{{ childlink.handle }}-{{ grandchildlink.handle }}"
-                                href="{{ grandchildlink.url }}"
-                                class="header__menu-item list-menu__item link link--text focus-inset caption-large{% if grandchildlink.current %} list-menu__item--active{% endif %}"
-                                {% if grandchildlink.current %}
-                                  aria-current="page"
-                                {% endif %}
-                              >
-                                {{ grandchildlink.title | escape }}
-                              </a>
-                            </li>
-                          {%- endfor -%}
-                        </ul>
-                      </details>
-                    {%- endif -%}
-                  </li>
-                {%- endfor -%}
-              </ul>
+
+              {% if parts.size >= 2 %}
+                {% render 'sub-menu-item', forloop:forloop, link:link, menuListType: parts[1] | strip %}
+              {%- else -%}
+                {% render 'sub-menu-item', forloop: forloop, link: link %}
+              {%- endif -%}
             </details>
           </header-menu>
         {%- else -%}
@@ -94,6 +43,7 @@
               {% endif %}
             >
               {{- link.title | escape -}}
+              {% comment %} 333 {% endcomment %}
             </span>
           </a>
         {%- endif -%}
@@ -101,3 +51,77 @@
     {%- endfor -%}
   </ul>
 </nav>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    let currentlyOpenMenu = null;
+    let globalCloseTimeout = null;
+
+    const menuItems = document.querySelectorAll('.header__inline-menu details');
+
+    function closeCurrentlyOpenMenu() {
+      if (currentlyOpenMenu) {
+        currentlyOpenMenu.open = false;
+        currentlyOpenMenu = null;
+      }
+    }
+
+    menuItems.forEach((item) => {
+      item.addEventListener('mouseenter', () => {
+        if (globalCloseTimeout) {
+          clearTimeout(globalCloseTimeout);
+          globalCloseTimeout = null;
+        }
+
+        if (currentlyOpenMenu && currentlyOpenMenu !== item) {
+          currentlyOpenMenu.open = false;
+        }
+
+        item.open = true;
+        currentlyOpenMenu = item;
+      });
+
+      item.addEventListener('mouseleave', (event) => {
+        const relatedTarget = event.relatedTarget;
+        const targetMenu = relatedTarget ? relatedTarget.closest('.header__inline-menu details') : null;
+
+        if (targetMenu && targetMenu !== item) {
+          item.open = false;
+          targetMenu.open = true;
+          currentlyOpenMenu = targetMenu;
+        } else if (!targetMenu) {
+          if (globalCloseTimeout) {
+            clearTimeout(globalCloseTimeout);
+          }
+
+          globalCloseTimeout = setTimeout(() => {
+            closeCurrentlyOpenMenu();
+            globalCloseTimeout = null;
+          }, 200);
+        }
+      });
+
+      const dropdownContent = item.querySelector('.header__submenu, .list-menu');
+      if (dropdownContent) {
+        dropdownContent.addEventListener('mouseleave', (event) => {
+          const relatedTarget = event.relatedTarget;
+          const isMenuArea =
+            relatedTarget &&
+            (relatedTarget.closest('.header__inline-menu details') ||
+              relatedTarget.closest('.header__submenu, .list-menu'));
+
+          if (!isMenuArea) {
+            if (globalCloseTimeout) {
+              clearTimeout(globalCloseTimeout);
+            }
+
+            globalCloseTimeout = setTimeout(() => {
+              closeCurrentlyOpenMenu();
+              globalCloseTimeout = null;
+            }, 200);
+          }
+        });
+      }
+    });
+  });
+</script>

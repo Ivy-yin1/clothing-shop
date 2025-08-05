@@ -2798,7 +2798,8 @@ details[open] > .header__submenu {
 }
 
 .header__menu-item:hover {
-  color: rgb(var(--color-foreground));
+  /* color: rgb(var(--color-foreground)); */
+  color: green;
 }
 
 .header__menu-item span {
@@ -2806,7 +2807,7 @@ details[open] > .header__submenu {
 }
 
 .header__menu-item:hover span {
-  text-decoration: underline;
+  /* text-decoration: underline; */
   text-underline-offset: 0.3rem;
 }
 
@@ -2868,7 +2869,13 @@ details[open] > .header__menu-item .icon-caret {
 }
 
 .header__submenu .header__menu-item:hover {
-  text-decoration-line: underline;
+  /* text-decoration-line: underline; */
+  color: green
+}
+
+
+.list-menu__item-level2-title-text {
+  text-align: center;
 }
 
 .header__menu-item .icon-caret {
