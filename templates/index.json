@@ -27,7 +27,7 @@
         "button"
       ],
       "settings": {
-        "image_2": "shopify:\/\/shop_images\/nav-mice.webp",
+        "image_2": "{{ shop.brand.logo }}",
         "image_overlay_opacity": 40,
         "image_height": "large",
         "image_behavior": "none",
